@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-export type ExceptionConstructor<T, PAYLOAD_TYPE, ERROR_TYPE> = new (... args: any[]) => T;
+export type TNewException<TException, TPayload, TError> = new (... args: any[]) => TException;
 
-export class Exception<PAYLOAD_TYPE, ERROR_TYPE> {
+export class Exception<TPayload, TError> {
     public message: string;
-    public err?: ERROR_TYPE;
-    public data?: PAYLOAD_TYPE;
+    public err?: TError;
+    public data?: TPayload;
 
-    constructor(message: string, data?: PAYLOAD_TYPE, err?: ERROR_TYPE) {
+    constructor(message: string, data?: TPayload, err?: TError) {
         this.message = message;
         this.data = data;
         this.err = err;
@@ -36,7 +36,7 @@ export class Exception<PAYLOAD_TYPE, ERROR_TYPE> {
      * @param {Function} ExceptionTypeConstructor the new Exception constructor
      * @returns {Exception} the new Exception
      */
-    public as<EXCEPTION_TYPE extends Exception<PAYLOAD_TYPE, ERROR_TYPE>>(ExceptionTypeConstructor: ExceptionConstructor<EXCEPTION_TYPE, PAYLOAD_TYPE, ERROR_TYPE>): EXCEPTION_TYPE {
+    public as<TException extends Exception<TPayload, TError>>(ExceptionTypeConstructor: TNewException<TException, TPayload, TError>): TException {
         return new ExceptionTypeConstructor(this.message, this.data, this.err);
     }
 
@@ -61,8 +61,8 @@ export class GenericException extends Exception<Record<string, any>, Error> {}
  * @param {*} data data
  * @returns {Exception} exception
  */
-export function fromError<EXCEPTION_TYPE extends Exception<PAYLOAD_TYPE, ERROR_TYPE>, PAYLOAD_TYPE, ERROR_TYPE extends Error>(err: ERROR_TYPE, message: string = err.message, data?: PAYLOAD_TYPE): Exception<PAYLOAD_TYPE, ERROR_TYPE> {
-    return new Exception<PAYLOAD_TYPE, ERROR_TYPE>(message, data, err);
+export function fromError<TException extends Exception<TPayload, TError>, TPayload, TError extends Error>(err: TError, message: string = err.message, data?: TPayload): Exception<TPayload, TError> {
+    return new Exception<TPayload, TError>(message, data, err);
 }
 
 /**
@@ -75,7 +75,7 @@ export function fromError<EXCEPTION_TYPE extends Exception<PAYLOAD_TYPE, ERROR_T
  * @throws {GenericException}
  * @returns {void}
  */
-export async function tryCatchWrap<ERROR_TYPE extends Error, PAYLOAD_TYPE, EXCEPTION_TYPE extends Exception<PAYLOAD_TYPE, ERROR_TYPE>>(handler: CallableFunction, ExceptionTypeConstructor?: ExceptionConstructor<EXCEPTION_TYPE, PAYLOAD_TYPE, ERROR_TYPE>, message?: string, data?: PAYLOAD_TYPE): Promise<void> {
+export async function tryCatchWrap<TError extends Error, TPayload, TException extends Exception<TPayload, TError>>(handler: CallableFunction, ExceptionTypeConstructor?: TNewException<TException, TPayload, TError>, message?: string, data?: TPayload): Promise<void> {
     try {
         return await handler();
     } catch (err) {
