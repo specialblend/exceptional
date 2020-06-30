@@ -1,6 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-export type TNewException<TException, TPayload, TError> = new (... args: any[]) => TException;
+export type TNewException<TException, TPayload, TError> = new (...args: any[]) => TException;
+
+export interface Exceptional<TPayload, TError> {
+    code: string;
+    message: string;
+    err?: TError;
+    data?: TPayload;
+}
 
 export class Exception<TPayload, TError> {
     public message: string;
@@ -52,7 +59,8 @@ export class Exception<TPayload, TError> {
 /**
  * GenericException
  */
-export class GenericException extends Exception<Record<string, any>, Error> {}
+export class GenericException extends Exception<Record<string, any>, Error> {
+}
 
 /**
  * Wrap a JavaScript error into an GenericException
