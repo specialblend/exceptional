@@ -51,7 +51,7 @@ export class Exception<PAYLOAD_TYPE, ERROR_TYPE> {
 /**
  * GenericException
  */
-export type GenericException = Exception<Record<string, any>, Error>;
+export class GenericException extends Exception<Record<string, any>, Error> {}
 
 /**
  * Wrap a JavaScript error into an GenericException
