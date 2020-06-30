@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-export type ExceptionConstructor<T, PAYLOAD_TYPE, ERROR_TYPE> = new (message: string, data?: PAYLOAD_TYPE, err?: ERROR_TYPE) => T;
+export type ExceptionConstructor<T, PAYLOAD_TYPE, ERROR_TYPE> = new (... args: any[]) => T;
 
 export class Exception<PAYLOAD_TYPE, ERROR_TYPE> {
     public message: string;
@@ -61,7 +61,7 @@ export class GenericException extends Exception<Record<string, any>, Error> {}
  * @param {*} data data
  * @returns {Exception} exception
  */
-export function fromError<ERROR_TYPE extends Error, PAYLOAD_TYPE>(err: ERROR_TYPE, message: string = err.message, data?: PAYLOAD_TYPE): Exception<PAYLOAD_TYPE, ERROR_TYPE> {
+export function fromError<EXCEPTION_TYPE extends Exception<PAYLOAD_TYPE, ERROR_TYPE>, PAYLOAD_TYPE, ERROR_TYPE extends Error>(err: ERROR_TYPE, message: string = err.message, data?: PAYLOAD_TYPE): Exception<PAYLOAD_TYPE, ERROR_TYPE> {
     return new Exception<PAYLOAD_TYPE, ERROR_TYPE>(message, data, err);
 }
 
@@ -75,10 +75,13 @@ export function fromError<ERROR_TYPE extends Error, PAYLOAD_TYPE>(err: ERROR_TYP
  * @throws {GenericException}
  * @returns {void}
  */
-export async function tryCatchWrap<PAYLOAD_TYPE, ERROR_TYPE, EXCEPTION_TYPE extends Exception<PAYLOAD_TYPE, ERROR_TYPE>>(handler: CallableFunction, ExceptionTypeConstructor: ExceptionConstructor<EXCEPTION_TYPE, PAYLOAD_TYPE, ERROR_TYPE>, message?: string, data?: PAYLOAD_TYPE): Promise<void> {
+export async function tryCatchWrap<ERROR_TYPE extends Error, PAYLOAD_TYPE, EXCEPTION_TYPE extends Exception<PAYLOAD_TYPE, ERROR_TYPE>>(handler: CallableFunction, ExceptionTypeConstructor?: ExceptionConstructor<EXCEPTION_TYPE, PAYLOAD_TYPE, ERROR_TYPE>, message?: string, data?: PAYLOAD_TYPE): Promise<void> {
     try {
         return await handler();
     } catch (err) {
+        if (typeof ExceptionTypeConstructor === 'undefined') {
+            throw fromError<GenericException, Record<string, any>, Error>(err, message || err.message, data).as(GenericException);
+        }
         throw fromError(err, message || err.message, data).as(ExceptionTypeConstructor);
     }
 }

@@ -1,4 +1,4 @@
-import { Exception, fromError, GenericException } from './Exception';
+import { Exception, fromError, GenericException, tryCatchWrap } from './Exception';
 
 describe('Exception', () => {
     test('is Function', () => {
@@ -159,7 +159,7 @@ describe('GenericException', () => {
             test('has expected properties', () => {
                 expect($ex.message).toBe($message);
                 expect($ex.data).toMatchObject($data);
-                expect($ex.data).not.toBe($data);
+                expect($ex.data).toBe($data);
                 expect($ex.code).toBe('GenericException');
                 expect($ex.err).toBeUndefined();
             });
@@ -219,7 +219,7 @@ describe('GenericException', () => {
             test('has expected properties', () => {
                 expect($ex.message).toBe($message);
                 expect($ex.data).toMatchObject($data);
-                expect($ex.data).not.toBe($data);
+                expect($ex.data).toBe($data);
                 expect($ex.code).toBe('GenericException');
                 expect($ex.err).toBe(_$err);
             });
@@ -415,6 +415,51 @@ describe('fromError', () => {
                 expect($ex).toBeInstanceOf(Exception);
                 expect($ex.message).toBe($message);
                 expect($ex.data).toBe($data);
+            });
+        });
+    });
+});
+
+describe('tryCatchWrap', () => {
+    test('is Function', () => {
+        expect(tryCatchWrap).toBeFunction();
+    });
+    describe('when called', () => {
+        describe('with no type constructor, no message, no data', () => {
+            const $err = new Error('I am an ugly error');
+            const $handler = jest.fn(() => {
+                throw $err;
+            });
+            test('throws expected MyFancyException', async() => {
+                expect.assertions(5);
+                try {
+                    await tryCatchWrap($handler);
+                } catch ($ex) {
+                    expect($ex).toBeInstanceOf(GenericException);
+                    expect($ex.message).toBe($err.message);
+                    expect($ex.code).toBe('GenericException');
+                    expect($ex.data).toBeUndefined();
+                    expect($ex.err).toBe($err);
+                }
+            });
+        });
+        describe('with type constructor, no message, no data', () => {
+            const $err = new Error('I am an ugly error');
+            class MyFancyException extends Exception {}
+            const $handler = jest.fn(() => {
+                throw $err;
+            });
+            test('throws expected MyFancyException', async() => {
+                expect.assertions(5);
+                try {
+                    await tryCatchWrap($handler, MyFancyException);
+                } catch ($ex) {
+                    expect($ex).toBeInstanceOf(MyFancyException);
+                    expect($ex.message).toBe($err.message);
+                    expect($ex.code).toBe('MyFancyException');
+                    expect($ex.data).toBeUndefined();
+                    expect($ex.err).toBe($err);
+                }
             });
         });
     });
