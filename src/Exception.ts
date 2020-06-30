@@ -54,12 +54,11 @@ export type GenericException = Exception<Record<string, any>, Error>;
 /**
  * Wrap a JavaScript error into an GenericException
  * @param {Error} err error
- * @param {string} code code
+ * @param {string} message message
  * @param {*} data data
  * @returns {Exception} exception
  */
-export function fromError<ERROR_TYPE extends Error, PAYLOAD_TYPE>(err: ERROR_TYPE, code: string, data: PAYLOAD_TYPE): Exception<PAYLOAD_TYPE, ERROR_TYPE> {
-    const { message } = err;
+export function fromError<ERROR_TYPE extends Error, PAYLOAD_TYPE>(err: ERROR_TYPE, message: string = err.message, data: PAYLOAD_TYPE): Exception<PAYLOAD_TYPE, ERROR_TYPE> {
     return new Exception<PAYLOAD_TYPE, ERROR_TYPE>(message, data, err);
 }
 
