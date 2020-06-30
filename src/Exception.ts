@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 type Nullable<T> = T | null;
 
 export class Exception<PAYLOAD_TYPE, ERROR_TYPE> {
@@ -23,7 +24,8 @@ export class Exception<PAYLOAD_TYPE, ERROR_TYPE> {
         const message = this.formatErrorMessage();
         const err = new Error(message);
         const data = { ...this.data };
-        Object.assign(err, { data });
+        const code = this.code;
+        Object.assign(err, { data, code });
         return err;
     }
 
@@ -54,11 +56,11 @@ export type GenericException = Exception<Record<string, any>, Error>;
 /**
  * Wrap a JavaScript error into an GenericException
  * @param {Error} err error
- * @param {string} message message
  * @param {*} data data
+ * @param {string} message message
  * @returns {Exception} exception
  */
-export function fromError<ERROR_TYPE extends Error, PAYLOAD_TYPE>(err: ERROR_TYPE, message: string = err.message, data: PAYLOAD_TYPE): Exception<PAYLOAD_TYPE, ERROR_TYPE> {
+export function fromError<ERROR_TYPE extends Error, PAYLOAD_TYPE>(err: ERROR_TYPE, data: PAYLOAD_TYPE, message: string = err.message): Exception<PAYLOAD_TYPE, ERROR_TYPE> {
     return new Exception<PAYLOAD_TYPE, ERROR_TYPE>(message, data, err);
 }
 
@@ -67,14 +69,15 @@ export function fromError<ERROR_TYPE extends Error, PAYLOAD_TYPE>(err: ERROR_TYP
  * and wrap any thrown errors as
  * @param {Function} handler handler
  * @param {Function} ExceptionConstructor constructor
- * @param {string} code code
+ * @param {Object} data data to associate with the thrown Exception
+ * @param {string} message message to associate with the thrown Exception, defaults to caught Error message
  * @throws {GenericException}
  * @returns {void}
  */
-export async function tryCatchWrap<EXCEPTION_TYPE extends GenericException>(handler: CallableFunction, ExceptionConstructor: new () => EXCEPTION_TYPE, code: string): Promise<void> {
+export async function tryCatchWrap<EXCEPTION_TYPE extends GenericException>(handler: CallableFunction, ExceptionConstructor: new () => EXCEPTION_TYPE, data: Record<string, any>, message?: string): Promise<void> {
     try {
         return await handler();
     } catch (err) {
-        throw fromError(err, code, {}).as<EXCEPTION_TYPE>(ExceptionConstructor);
+        throw fromError(err, {}, message || err.message).as<EXCEPTION_TYPE>(ExceptionConstructor);
     }
 }
