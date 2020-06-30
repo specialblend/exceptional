@@ -32,9 +32,9 @@ describe('Exception', () => {
             test('has expected properties', () => {
                 expect($ex.message).toBe($message);
                 expect($ex.data).toMatchObject($data);
-                expect($ex.data).not.toBe($data);
+                expect($ex.data).toBe($data);
                 expect($ex.code).toBe('Exception');
-                expect($ex.err).toBeNull();
+                expect($ex.err).toBeUndefined();
             });
 
             describe('method', () => {
@@ -92,7 +92,7 @@ describe('Exception', () => {
             test('has expected properties', () => {
                 expect($ex.message).toBe($message);
                 expect($ex.data).toMatchObject($data);
-                expect($ex.data).not.toBe($data);
+                expect($ex.data).toBe($data);
                 expect($ex.code).toBe('Exception');
                 expect($ex.err).toBe(_$err);
             });
@@ -161,7 +161,7 @@ describe('GenericException', () => {
                 expect($ex.data).toMatchObject($data);
                 expect($ex.data).not.toBe($data);
                 expect($ex.code).toBe('GenericException');
-                expect($ex.err).toBeNull();
+                expect($ex.err).toBeUndefined();
             });
 
             describe('method', () => {
@@ -287,9 +287,9 @@ describe('MyException class extends Exception', () => {
             test('has expected properties', () => {
                 expect($ex.message).toBe($message);
                 expect($ex.data).toMatchObject($data);
-                expect($ex.data).not.toBe($data);
+                expect($ex.data).toBe($data);
                 expect($ex.code).toBe('MyException');
-                expect($ex.err).toBeNull();
+                expect($ex.err).toBeUndefined();
             });
 
             describe('method', () => {
@@ -347,7 +347,7 @@ describe('MyException class extends Exception', () => {
             test('has expected properties', () => {
                 expect($ex.message).toBe($message);
                 expect($ex.data).toMatchObject($data);
-                expect($ex.data).not.toBe($data);
+                expect($ex.data).toBe($data);
                 expect($ex.code).toBe('MyException');
                 expect($ex.err).toBe(_$err);
             });

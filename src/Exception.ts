@@ -1,14 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-type Nullable<T> = T | null;
+
+export type ExceptionConstructor<T, PAYLOAD_TYPE, ERROR_TYPE> = new (message: string, data?: PAYLOAD_TYPE, err?: ERROR_TYPE) => T;
 
 export class Exception<PAYLOAD_TYPE, ERROR_TYPE> {
     public message: string;
-    public err: Nullable<ERROR_TYPE>;
-    public data: PAYLOAD_TYPE;
+    public err?: ERROR_TYPE;
+    public data?: PAYLOAD_TYPE;
 
-    constructor(message: string, data: PAYLOAD_TYPE, err: Nullable<ERROR_TYPE> = null) {
+    constructor(message: string, data?: PAYLOAD_TYPE, err?: ERROR_TYPE) {
         this.message = message;
-        this.data = { ...data };
+        this.data = data;
         this.err = err;
     }
 
@@ -30,13 +31,13 @@ export class Exception<PAYLOAD_TYPE, ERROR_TYPE> {
     }
 
     /**
-     * Map this Exception object into a new Exception of a different type, inherting this Exception's data and metadata.
+     * Cast Exception object into a new Exception of a different type, inherting this Exception's message, data and err.
      * This is useful for rethrowing an exception carrying the same payload but is intended to be routed and/or handled differently.
-     * @param {Function} ExceptionConstructor the new Exception constructor
+     * @param {Function} ExceptionTypeConstructor the new Exception constructor
      * @returns {Exception} the new Exception
      */
-    public as<EXCEPTION_TYPE extends Exception<PAYLOAD_TYPE, ERROR_TYPE>>(ExceptionConstructor: new <P, C>(message: string, data: PAYLOAD_TYPE) => EXCEPTION_TYPE): EXCEPTION_TYPE {
-        return new ExceptionConstructor<PAYLOAD_TYPE, CODE_TYPE>(this.message, this.data);
+    public as<EXCEPTION_TYPE extends Exception<PAYLOAD_TYPE, ERROR_TYPE>>(ExceptionTypeConstructor: ExceptionConstructor<EXCEPTION_TYPE, PAYLOAD_TYPE, ERROR_TYPE>): EXCEPTION_TYPE {
+        return new ExceptionTypeConstructor(this.message, this.data, this.err);
     }
 
     /**
@@ -60,7 +61,7 @@ export class GenericException extends Exception<Record<string, any>, Error> {}
  * @param {string} message message
  * @returns {Exception} exception
  */
-export function fromError<ERROR_TYPE extends Error, PAYLOAD_TYPE>(err: ERROR_TYPE, data: PAYLOAD_TYPE, message: string = err.message): Exception<PAYLOAD_TYPE, ERROR_TYPE> {
+export function fromError<ERROR_TYPE extends Error, PAYLOAD_TYPE>(err: ERROR_TYPE, data?: PAYLOAD_TYPE, message: string = err.message): Exception<PAYLOAD_TYPE, ERROR_TYPE> {
     return new Exception<PAYLOAD_TYPE, ERROR_TYPE>(message, data, err);
 }
 
@@ -68,16 +69,16 @@ export function fromError<ERROR_TYPE extends Error, PAYLOAD_TYPE>(err: ERROR_TYP
  * Perform a try-catch on provided handler,
  * and wrap any thrown errors as
  * @param {Function} handler handler
- * @param {Function} ExceptionConstructor constructor
- * @param {Object} data data to associate with the thrown Exception
+ * @param {Function} ExceptionTypeConstructor constructor
  * @param {string} message message to associate with the thrown Exception, defaults to caught Error message
+ * @param {Object} data data to associate with the thrown Exception
  * @throws {GenericException}
  * @returns {void}
  */
-export async function tryCatchWrap<EXCEPTION_TYPE extends GenericException>(handler: CallableFunction, ExceptionConstructor: new () => EXCEPTION_TYPE, data: Record<string, any>, message?: string): Promise<void> {
+export async function tryCatchWrap<PAYLOAD_TYPE, ERROR_TYPE, EXCEPTION_TYPE extends Exception<PAYLOAD_TYPE, ERROR_TYPE>>(handler: CallableFunction, ExceptionTypeConstructor: ExceptionConstructor<EXCEPTION_TYPE, PAYLOAD_TYPE, ERROR_TYPE>, message: string, data: PAYLOAD_TYPE): Promise<void> {
     try {
         return await handler();
     } catch (err) {
-        throw fromError(err, {}, message || err.message).as<EXCEPTION_TYPE>(ExceptionConstructor);
+        throw fromError(err, data, message || err.message).as(ExceptionTypeConstructor);
     }
 }
