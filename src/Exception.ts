@@ -2,14 +2,14 @@
 type Nullable<T> = T | null;
 
 export class Exception<PAYLOAD_TYPE, ERROR_TYPE> {
-    private _message: string;
-    private _err: Nullable<ERROR_TYPE>;
-    private data: PAYLOAD_TYPE;
+    public message: string;
+    public err: Nullable<ERROR_TYPE>;
+    public data: PAYLOAD_TYPE;
 
     constructor(message: string, data: PAYLOAD_TYPE, err: Nullable<ERROR_TYPE> = null) {
-        this._message = message;
+        this.message = message;
         this.data = { ...data };
-        this._err = err;
+        this.err = err;
     }
 
     public get code(): string {
@@ -36,7 +36,7 @@ export class Exception<PAYLOAD_TYPE, ERROR_TYPE> {
      * @returns {Exception} the new Exception
      */
     public as<EXCEPTION_TYPE extends Exception<PAYLOAD_TYPE, ERROR_TYPE>>(ExceptionConstructor: new <P, C>(message: string, data: PAYLOAD_TYPE) => EXCEPTION_TYPE): EXCEPTION_TYPE {
-        return new ExceptionConstructor<PAYLOAD_TYPE, CODE_TYPE>(this._message, this.data);
+        return new ExceptionConstructor<PAYLOAD_TYPE, CODE_TYPE>(this.message, this.data);
     }
 
     /**
@@ -44,7 +44,7 @@ export class Exception<PAYLOAD_TYPE, ERROR_TYPE> {
      * @returns {string} error message
      */
     protected formatErrorMessage(): string {
-        return [this.code, this._message].join(': ');
+        return [this.code, this.message].join(': ');
     }
 }
 
