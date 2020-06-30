@@ -110,3 +110,5 @@ lib
 # ignore editor files
 .idea
 .vscode
+
+example.js

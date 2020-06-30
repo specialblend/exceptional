@@ -1,30 +1,3 @@
-# Exceptional
-
-user and machine friendly errors and exceptions
-
-### Philosophy
-
-#### Exception: a throwable from which the program reasonably tries to recover.
-
-Examples: 
-- bad user input => `InvalidParametersException`
-- a connection error => `MongoConnectionException`
-- a login failure => `InvalidLoginException`
-
-#### Error: a throwable from which the program would not reasonably recover.
-
-Examples: 
-- Uncaught SyntaxError: Unexpected token else
-- Uncaught TypeError: Cannot read property foo of undefined
-
-### Installation
-
-`npm install @specialblend/exceptional`
-
-### Usage
-
-```typescript
-
 import { Exception, tryCatchWrap } from './src/Exception';
 
 interface FancyExceptionData {
@@ -64,5 +37,3 @@ interface FancyExceptionData {
         console.error(ex.message, ex.code, ex.data, ex.err);
     }
 }());
-
-``
