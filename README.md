@@ -4,18 +4,20 @@ user and machine friendly errors and exceptions
 
 ### Philosophy
 
-#### Exception: a throwable from which the program reasonably tries to recover.
+**Exception: a throwable from which the program should reasonably recover.**
 
 Examples: 
 - bad user input => `InvalidParametersException`
-- a connection error => `MongoConnectionException`
-- a login failure => `InvalidLoginException`
+- connection error => `MongoConnectionException`
+- login failure => `InvalidLoginException`
 
-#### Error: a throwable from which the program would not reasonably recover.
+**Error: a throwable from which the program would not reasonably recover.**
 
 Examples: 
 - Uncaught SyntaxError: Unexpected token else
 - Uncaught TypeError: Cannot read property foo of undefined
+
+**Exceptions** should be written for machines. **Errors** should be written for humans.
 
 ### Installation
 
