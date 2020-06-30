@@ -462,5 +462,49 @@ describe('tryCatchWrap', () => {
                 }
             });
         });
+        describe('with type constructor, message, no data', () => {
+            const $err = new Error('I am an ugly error');
+            const $message = 'I am a user-friendly error message';
+            class MyFancyException extends Exception {}
+            const $handler = jest.fn(() => {
+                throw $err;
+            });
+            test('throws expected MyFancyException', async() => {
+                expect.assertions(5);
+                try {
+                    await tryCatchWrap($handler, MyFancyException, $message);
+                } catch ($ex) {
+                    expect($ex).toBeInstanceOf(MyFancyException);
+                    expect($ex.message).toBe($message);
+                    expect($ex.code).toBe('MyFancyException');
+                    expect($ex.data).toBeUndefined();
+                    expect($ex.err).toBe($err);
+                }
+            });
+        });
+        describe('with type constructor, message, data', () => {
+            const $err = new Error('I am an ugly error');
+            const $message = 'I am a user-friendly error message';
+            const $data = {
+                foo: 'I contain information about the error',
+                bar: 'and I do too',
+            };
+            class MyFancyException extends Exception {}
+            const $handler = jest.fn(() => {
+                throw $err;
+            });
+            test('throws expected MyFancyException', async() => {
+                expect.assertions(5);
+                try {
+                    await tryCatchWrap($handler, MyFancyException, $message, $data);
+                } catch ($ex) {
+                    expect($ex).toBeInstanceOf(MyFancyException);
+                    expect($ex.message).toBe($message);
+                    expect($ex.code).toBe('MyFancyException');
+                    expect($ex.data).toBe($data);
+                    expect($ex.err).toBe($err);
+                }
+            });
+        });
     });
 });
