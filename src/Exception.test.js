@@ -1,4 +1,4 @@
-import { Exception, GenericException } from './Exception';
+import { Exception, fromError, GenericException } from './Exception';
 
 describe('Exception', () => {
     test('is Function', () => {
@@ -377,6 +377,44 @@ describe('MyException class extends Exception', () => {
                         });
                     });
                 });
+            });
+        });
+    });
+});
+
+describe('fromError', () => {
+    test('is Function', () => {
+        expect(fromError).toBeFunction();
+    });
+    describe('when called', () => {
+        describe('with no message, no data', () => {
+            test('returns expected Exception', () => {
+                const $err = new Error('something bad happened.');
+                const $ex = fromError($err);
+                expect($ex).toBeInstanceOf(Exception);
+                expect($ex.message).toBe($err.message);
+                expect($ex.data).toBeUndefined();
+            });
+        });
+        describe('with message, with no data', () => {
+            test('returns expected Exception', () => {
+                const $message = 'Some fancy error message.';
+                const $err = new Error('something really bad happened.');
+                const $ex = fromError($err, $message);
+                expect($ex).toBeInstanceOf(Exception);
+                expect($ex.message).toBe($message);
+                expect($ex.data).toBeUndefined();
+            });
+        });
+        describe('with message, with no data', () => {
+            test('returns expected Exception', () => {
+                const $data = Symbol('data');
+                const $message = 'Some really fancy error message.';
+                const $err = new Error('something really bad happened.');
+                const $ex = fromError($err, $message, $data);
+                expect($ex).toBeInstanceOf(Exception);
+                expect($ex.message).toBe($message);
+                expect($ex.data).toBe($data);
             });
         });
     });
