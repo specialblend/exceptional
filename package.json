@@ -26,5 +26,26 @@
     "jest": "^26.1.0",
     "jest-extended": "^0.11.5",
     "typescript": "^3.9.5"
-  }
+  },
+  "name": "@specialblend/exceptional",
+  "description": "user and machine friendly errors and exceptions",
+  "version": "0.0.0",
+  "directories": {
+    "lib": "lib"
+  },
+  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/specialblend/exceptional.git"
+  },
+  "keywords": [
+    "error",
+    "exception"
+  ],
+  "author": "cj@specialblend.net",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/specialblend/exceptional/issues"
+  },
+  "homepage": "https://github.com/specialblend/exceptional#readme"
 }
