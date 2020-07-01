@@ -41,8 +41,8 @@ export class Exception<TCode, TPayload, TError> implements IException<TCode, TPa
  */
 export class GenericException extends Exception<string, Record<string, any>, Error> {}
 
-export function wrap<TCode, TPayload, TError>(Factory: TNewException<TCode, TPayload, TError>, message: string, code: TCode, data?: TPayload) {
-    const WrappedException = class extends Factory {
+export function createExceptionWrapper<TCode, TPayload, TError>(Factory: TNewException<TCode, TPayload, TError>, message: string, code: TCode, data?: TPayload) {
+    return class extends Factory {
         constructor(err: TError) {
             super();
             return new Factory(message, code, data, err);
