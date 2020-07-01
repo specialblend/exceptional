@@ -1,5 +1,5 @@
 {
-  "main": "lib/Exception.js.js",
+  "main": "lib/Exception.js",
   "types": "lib/Exception.d.ts",
   "scripts": {
     "build": "tsc",
