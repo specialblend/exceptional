@@ -16,35 +16,35 @@ const ExceptionMessageDictionary = {
     [EX_AUTH_NOT_HAS_OWNERSHIP]: 'The authenticated user does not have the required ownership over this resource to perform this action. Please contact your technical administrator for further assistance.',
 };
 
+class InvalidCredentialsEx extends createExceptionWrapper(
+    AuthenticationException,
+    ExceptionMessageDictionary[EX_AUTH_INVALID_CREDENTIALS],
+    EX_AUTH_INVALID_CREDENTIALS
+) {}
+
+class MissingTokenEx extends createExceptionWrapper(
+    AuthenticationException,
+    ExceptionMessageDictionary[EX_AUTH_MISSING_TOKEN],
+    EX_AUTH_MISSING_TOKEN
+) {}
+
+class NotHasAbilityEx extends createExceptionWrapper(
+    AuthorizationException,
+    ExceptionMessageDictionary[EX_AUTH_NOT_HAS_ABILITY],
+    EX_AUTH_NOT_HAS_ABILITY
+) {}
+
+class NotHasOwnershipEx extends createExceptionWrapper(
+    AuthorizationException,
+    ExceptionMessageDictionary[EX_AUTH_NOT_HAS_OWNERSHIP],
+    EX_AUTH_NOT_HAS_OWNERSHIP
+) {}
+
 describe('createExceptionWrapper', () => {
     test('is Function', () => {
         expect(createExceptionWrapper).toBeFunction();
     });
-    describe('when called', () => {
-        class InvalidCredentialsEx extends createExceptionWrapper(
-            AuthenticationException,
-            ExceptionMessageDictionary[EX_AUTH_INVALID_CREDENTIALS],
-            EX_AUTH_INVALID_CREDENTIALS
-        ) {}
-
-        class MissingTokenEx extends createExceptionWrapper(
-            AuthenticationException,
-            ExceptionMessageDictionary[EX_AUTH_MISSING_TOKEN],
-            EX_AUTH_MISSING_TOKEN
-        ) {}
-
-        class NotHasAbilityEx extends createExceptionWrapper(
-            AuthorizationException,
-            ExceptionMessageDictionary[EX_AUTH_NOT_HAS_ABILITY],
-            EX_AUTH_NOT_HAS_ABILITY
-        ) {}
-
-        class NotHasOwnershipEx extends createExceptionWrapper(
-            AuthorizationException,
-            ExceptionMessageDictionary[EX_AUTH_NOT_HAS_OWNERSHIP],
-            EX_AUTH_NOT_HAS_OWNERSHIP
-        ) {}
-
+    describe('when result extended by', () => {
         describe('class InvalidCredentialsEx', () => {
             test('returns a class extending Exception', () => {
                 expect(InvalidCredentialsEx).toBeFunction();
