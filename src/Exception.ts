@@ -1,33 +1,27 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-export type TNewException<TException, TPayload, TError> = new (...args: any[]) => TException;
+export type TNewException<TCode, TData, TError> = new (...args: any[]) => IException<TCode, TData, TError>;
 
-export interface Exceptional<TPayload, TError> {
-    code: string;
+export interface IException<TCode, TData, TError> {
     message: string;
+    code: TCode;
     err?: TError;
-    data?: TPayload;
+    data?: TData;
 }
 
-export class Exception<TPayload, TError> {
+export class Exception<TCode, TData, TError> implements IException<TCode, TData, TError> {
     public message: string;
+    public code: TCode;
+    public data?: TData;
     public err?: TError;
-    public data?: TPayload;
 
-    constructor(message: string, data?: TPayload, err?: TError) {
+    constructor(message: string, code: TCode, data?: TData, err?: TError) {
         this.message = message;
+        this.code = code;
         this.data = data;
         this.err = err;
     }
 
-    public get code(): string {
-        return this.constructor.name;
-    }
-
-    /**
-     * Unwrap this Exception into a JavaScript Error object.
-     * @returns {Error} error
-     */
     public toError(): Error {
         const message = this.formatErrorMessage();
         const err = new Error(message);
@@ -37,59 +31,43 @@ export class Exception<TPayload, TError> {
         return err;
     }
 
-    /**
-     * Cast Exception object into a new Exception of a different type, inherting this Exception's message, data and err.
-     * This is useful for rethrowing an exception carrying the same payload but is intended to be routed and/or handled differently.
-     * @param {Function} ExceptionTypeConstructor the new Exception constructor
-     * @returns {Exception} the new Exception
-     */
-    public as<TException extends Exception<TPayload, TError>>(ExceptionTypeConstructor: TNewException<TException, TPayload, TError>): TException {
-        return new ExceptionTypeConstructor(this.message, this.data, this.err);
-    }
-
-    /**
-     * Format the error message when mapping to a  JavaScript Error object
-     * @returns {string} error message
-     */
     protected formatErrorMessage(): string {
         return [this.code, this.message].join(': ');
     }
 }
 
 /**
- * GenericException
+ * GenericException: An Exception with string code, JavaScript Object payload, JavaScript Error
  */
-export class GenericException extends Exception<Record<string, any>, Error> {
-}
+export class GenericException extends Exception<string, Record<string, any>, Error> {}
 
 /**
- * Wrap a JavaScript error into an GenericException
- * @param {Error} err error
+ * Returns a class extending `Factory` which can wrap JavaScript errors using `new` syntax
+ * @param {Function} Factory parent class to extend
  * @param {string} message message
- * @param {*} data data
- * @returns {Exception} exception
+ * @param {TCode} code exception code
+ * @param {TData} data payload
+ * @returns {Function} wrapper class
  */
-export function fromError<TException extends Exception<TPayload, TError>, TPayload, TError extends Error>(err: TError, message: string = err.message, data?: TPayload): Exception<TPayload, TError> {
-    return new Exception<TPayload, TError>(message, data, err);
+export function createExceptionWrapper<TCode, TData, TError>(Factory: TNewException<TCode, TData, TError>, message: string, code: TCode, data?: TData) {
+    return class extends Factory {
+        constructor(err: TError) {
+            super();
+            return new Factory(message, code, data, err);
+        }
+    };
 }
 
 /**
- * Perform a try-catch on provided handler,
- * and wrap any thrown errors as
- * @param {Function} handler handler
- * @param {Function} ExceptionTypeConstructor constructor
- * @param {string} message message to associate with the thrown Exception, defaults to caught Error message
- * @param {Object} data data to associate with the thrown Exception
- * @throws {GenericException}
- * @returns {void}
+ * Calls provided async handler, wraps unhandled Error into Exception and rethrows.
+ * @param {Function} Factory parent class to extend
+ * @param {Function} handler async handler
+ * @returns {Promise<void>} none
  */
-export async function tryCatchWrap<TError extends Error, TPayload, TException extends Exception<TPayload, TError>>(handler: CallableFunction, ExceptionTypeConstructor?: TNewException<TException, TPayload, TError>, message?: string, data?: TPayload): Promise<void> {
+export async function tryCatchWrap<TCode, TData, TError>(Factory: TNewException<TCode, TData, TError>, handler: CallableFunction): Promise<void> {
     try {
-        return await handler();
+        await handler();
     } catch (err) {
-        if (typeof ExceptionTypeConstructor === 'undefined') {
-            throw fromError<GenericException, Record<string, any>, Error>(err, message || err.message, data).as(GenericException);
-        }
-        throw fromError(err, message || err.message, data).as(ExceptionTypeConstructor);
+        throw new Factory(err);
     }
 }

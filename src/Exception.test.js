@@ -1,4 +1,6 @@
-import { Exception, fromError, GenericException, tryCatchWrap } from './Exception';
+import 'jest-extended';
+
+import { Exception, GenericException } from './Exception';
 
 describe('Exception', () => {
     test('is Function', () => {
@@ -13,9 +15,10 @@ describe('Exception', () => {
                 foo: 'example.foo',
                 bar: 'example.bar',
             };
+            const $code = 'alpha';
             beforeAll(() => {
                 try {
-                    $ex = new Exception($message, $data);
+                    $ex = new Exception($message, $code, $data);
                 } catch (err) {
                     $reject(err);
                 }
@@ -33,7 +36,7 @@ describe('Exception', () => {
                 expect($ex.message).toBe($message);
                 expect($ex.data).toMatchObject($data);
                 expect($ex.data).toBe($data);
-                expect($ex.code).toBe('Exception');
+                expect($ex.code).toBe($code);
                 expect($ex.err).toBeUndefined();
             });
 
@@ -72,10 +75,11 @@ describe('Exception', () => {
                 foo: 'example.foo',
                 bar: 'example.bar',
             };
+            const $code = 'bravo';
             const _$err = new Error('test error!');
             beforeAll(() => {
                 try {
-                    $ex = new Exception($message, $data, _$err);
+                    $ex = new Exception($message, $code, $data, _$err);
                 } catch (err) {
                     $reject(err);
                 }
@@ -93,7 +97,7 @@ describe('Exception', () => {
                 expect($ex.message).toBe($message);
                 expect($ex.data).toMatchObject($data);
                 expect($ex.data).toBe($data);
-                expect($ex.code).toBe('Exception');
+                expect($ex.code).toBe($code);
                 expect($ex.err).toBe(_$err);
             });
 
@@ -140,9 +144,10 @@ describe('GenericException', () => {
                 foo: 'example.foo',
                 bar: 'example.bar',
             };
+            const $code = 'charlie';
             beforeAll(() => {
                 try {
-                    $ex = new GenericException($message, $data);
+                    $ex = new GenericException($message, $code, $data);
                 } catch (err) {
                     $reject(err);
                 }
@@ -160,7 +165,7 @@ describe('GenericException', () => {
                 expect($ex.message).toBe($message);
                 expect($ex.data).toMatchObject($data);
                 expect($ex.data).toBe($data);
-                expect($ex.code).toBe('GenericException');
+                expect($ex.code).toBe($code);
                 expect($ex.err).toBeUndefined();
             });
 
@@ -199,10 +204,11 @@ describe('GenericException', () => {
                 foo: 'example.foo',
                 bar: 'example.bar',
             };
+            const $code = 'delta';
             const _$err = new Error('test error!');
             beforeAll(() => {
                 try {
-                    $ex = new GenericException($message, $data, _$err);
+                    $ex = new GenericException($message, $code, $data, _$err);
                 } catch (err) {
                     $reject(err);
                 }
@@ -220,7 +226,7 @@ describe('GenericException', () => {
                 expect($ex.message).toBe($message);
                 expect($ex.data).toMatchObject($data);
                 expect($ex.data).toBe($data);
-                expect($ex.code).toBe('GenericException');
+                expect($ex.code).toBe($code);
                 expect($ex.err).toBe(_$err);
             });
 
@@ -268,9 +274,10 @@ describe('MyException class extends Exception', () => {
                 foo: 'example.foo',
                 bar: 'example.bar',
             };
+            const $code = 'echo';
             beforeAll(() => {
                 try {
-                    $ex = new MyException($message, $data);
+                    $ex = new MyException($message, $code, $data);
                 } catch (err) {
                     $reject(err);
                 }
@@ -288,7 +295,7 @@ describe('MyException class extends Exception', () => {
                 expect($ex.message).toBe($message);
                 expect($ex.data).toMatchObject($data);
                 expect($ex.data).toBe($data);
-                expect($ex.code).toBe('MyException');
+                expect($ex.code).toBe($code);
                 expect($ex.err).toBeUndefined();
             });
 
@@ -327,10 +334,11 @@ describe('MyException class extends Exception', () => {
                 foo: 'example.foo',
                 bar: 'example.bar',
             };
+            const $code = 'foxtrot';
             const _$err = new Error('test error!');
             beforeAll(() => {
                 try {
-                    $ex = new MyException($message, $data, _$err);
+                    $ex = new MyException($message, $code, $data, _$err);
                 } catch (err) {
                     $reject(err);
                 }
@@ -348,7 +356,7 @@ describe('MyException class extends Exception', () => {
                 expect($ex.message).toBe($message);
                 expect($ex.data).toMatchObject($data);
                 expect($ex.data).toBe($data);
-                expect($ex.code).toBe('MyException');
+                expect($ex.code).toBe($code);
                 expect($ex.err).toBe(_$err);
             });
 
@@ -377,133 +385,6 @@ describe('MyException class extends Exception', () => {
                         });
                     });
                 });
-            });
-        });
-    });
-});
-
-describe('fromError', () => {
-    test('is Function', () => {
-        expect(fromError).toBeFunction();
-    });
-    describe('when called', () => {
-        describe('with no message, no data', () => {
-            test('returns expected Exception', () => {
-                const $err = new Error('something bad happened.');
-                const $ex = fromError($err);
-                expect($ex).toBeInstanceOf(Exception);
-                expect($ex.message).toBe($err.message);
-                expect($ex.data).toBeUndefined();
-            });
-        });
-        describe('with message, with no data', () => {
-            test('returns expected Exception', () => {
-                const $message = 'Some fancy error message.';
-                const $err = new Error('something really bad happened.');
-                const $ex = fromError($err, $message);
-                expect($ex).toBeInstanceOf(Exception);
-                expect($ex.message).toBe($message);
-                expect($ex.data).toBeUndefined();
-            });
-        });
-        describe('with message, with no data', () => {
-            test('returns expected Exception', () => {
-                const $data = Symbol('data');
-                const $message = 'Some really fancy error message.';
-                const $err = new Error('something really bad happened.');
-                const $ex = fromError($err, $message, $data);
-                expect($ex).toBeInstanceOf(Exception);
-                expect($ex.message).toBe($message);
-                expect($ex.data).toBe($data);
-            });
-        });
-    });
-});
-
-describe('tryCatchWrap', () => {
-    test('is Function', () => {
-        expect(tryCatchWrap).toBeFunction();
-    });
-    describe('when called', () => {
-        describe('with no type constructor, no message, no data', () => {
-            const $err = new Error('I am an ugly error');
-            const $handler = jest.fn(() => {
-                throw $err;
-            });
-            test('throws expected MyFancyException', async() => {
-                expect.assertions(5);
-                try {
-                    await tryCatchWrap($handler);
-                } catch ($ex) {
-                    expect($ex).toBeInstanceOf(GenericException);
-                    expect($ex.message).toBe($err.message);
-                    expect($ex.code).toBe('GenericException');
-                    expect($ex.data).toBeUndefined();
-                    expect($ex.err).toBe($err);
-                }
-            });
-        });
-        describe('with type constructor, no message, no data', () => {
-            const $err = new Error('I am an ugly error');
-            class MyFancyException extends Exception {}
-            const $handler = jest.fn(() => {
-                throw $err;
-            });
-            test('throws expected MyFancyException', async() => {
-                expect.assertions(5);
-                try {
-                    await tryCatchWrap($handler, MyFancyException);
-                } catch ($ex) {
-                    expect($ex).toBeInstanceOf(MyFancyException);
-                    expect($ex.message).toBe($err.message);
-                    expect($ex.code).toBe('MyFancyException');
-                    expect($ex.data).toBeUndefined();
-                    expect($ex.err).toBe($err);
-                }
-            });
-        });
-        describe('with type constructor, message, no data', () => {
-            const $err = new Error('I am an ugly error');
-            const $message = 'I am a user-friendly error message';
-            class MyFancyException extends Exception {}
-            const $handler = jest.fn(() => {
-                throw $err;
-            });
-            test('throws expected MyFancyException', async() => {
-                expect.assertions(5);
-                try {
-                    await tryCatchWrap($handler, MyFancyException, $message);
-                } catch ($ex) {
-                    expect($ex).toBeInstanceOf(MyFancyException);
-                    expect($ex.message).toBe($message);
-                    expect($ex.code).toBe('MyFancyException');
-                    expect($ex.data).toBeUndefined();
-                    expect($ex.err).toBe($err);
-                }
-            });
-        });
-        describe('with type constructor, message, data', () => {
-            const $err = new Error('I am an ugly error');
-            const $message = 'I am a user-friendly error message';
-            const $data = {
-                foo: 'I contain information about the error',
-                bar: 'and I do too',
-            };
-            class MyFancyException extends Exception {}
-            const $handler = jest.fn(() => {
-                throw $err;
-            });
-            test('throws expected MyFancyException', async() => {
-                expect.assertions(5);
-                try {
-                    await tryCatchWrap($handler, MyFancyException, $message, $data);
-                } catch ($ex) {
-                    expect($ex).toBeInstanceOf(MyFancyException);
-                    expect($ex.message).toBe($message);
-                    expect($ex.code).toBe('MyFancyException');
-                    expect($ex.data).toBe($data);
-                    expect($ex.err).toBe($err);
-                }
             });
         });
     });
