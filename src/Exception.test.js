@@ -1,3 +1,4 @@
+import 'jest-extended';
 import { Exception, GenericException } from './Exception';
 
 describe('Exception', () => {

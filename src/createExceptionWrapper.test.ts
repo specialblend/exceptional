@@ -1,3 +1,5 @@
+import 'jest-extended';
+
 import { createExceptionWrapper, Exception, IException } from './Exception';
 
 class AuthException extends Exception<symbol, Record<string, any>, Error> implements IException<symbol, Record<string, any>, Error> {}
