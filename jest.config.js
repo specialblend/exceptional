@@ -13,12 +13,12 @@ const coverageThreshold = {
 };
 
 const coveragePathIgnorePatterns = [
-    '<rootDir>/node_modules/',
     '<rootDir>/coverage/',
+    '<rootDir>/examples/',
     '<rootDir>/jest.config.js',
     '<rootDir>/lib',
+    '<rootDir>/node_modules/',
     '<rootDir>/scripts',
-    '<rootDir>/example.ts',
 ];
 
 const globalSetup = './__mocks__/environment.js';
