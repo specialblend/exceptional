@@ -1,4 +1,4 @@
-import { Exception, tryCatchWrap } from './src/Exception';
+import { Exception, tryCatchWrap } from '../src/Exception';
 
 interface FancyExceptionData {
     foo: string,
