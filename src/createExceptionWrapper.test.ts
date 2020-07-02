@@ -16,41 +16,54 @@ const ExceptionMessageDictionary = {
     [EX_AUTH_NOT_HAS_OWNERSHIP]: 'The authenticated user does not have the required ownership over this resource to perform this action. Please contact your technical administrator for further assistance.',
 };
 
-class InvalidCredentialsEx extends createExceptionWrapper(
-    AuthenticationException,
-    ExceptionMessageDictionary[EX_AUTH_INVALID_CREDENTIALS],
-    EX_AUTH_INVALID_CREDENTIALS
-) {}
-
-class MissingTokenEx extends createExceptionWrapper(
-    AuthenticationException,
-    ExceptionMessageDictionary[EX_AUTH_MISSING_TOKEN],
-    EX_AUTH_MISSING_TOKEN
-) {}
-
-class NotHasAbilityEx extends createExceptionWrapper(
-    AuthorizationException,
-    ExceptionMessageDictionary[EX_AUTH_NOT_HAS_ABILITY],
-    EX_AUTH_NOT_HAS_ABILITY
-) {}
-
-class NotHasOwnershipEx extends createExceptionWrapper(
-    AuthorizationException,
-    ExceptionMessageDictionary[EX_AUTH_NOT_HAS_OWNERSHIP],
-    EX_AUTH_NOT_HAS_OWNERSHIP
-) {}
-
-describe('new InvalidCredentialsEx(Error)', () => {
-    const $err = new Error('I am an ugly error.');
-    const $ex = new InvalidCredentialsEx($err);
-    test('inherits from expected classes', () => {
-        expect($ex).toBeInstanceOf(AuthenticationException);
-        expect($ex).toBeInstanceOf(AuthException);
-        expect($ex).toBeInstanceOf(Exception);
+describe('createExceptionWrapper', () => {
+    test('is Function', () => {
+        expect(createExceptionWrapper).toBeFunction();
     });
-    test('has expected properties', () => {
-        expect($ex.message).toBe(ExceptionMessageDictionary[EX_AUTH_INVALID_CREDENTIALS]);
-        expect($ex.code).toBe(EX_AUTH_INVALID_CREDENTIALS);
-        expect($ex.err).toBe($err);
+    describe('when called', () => {
+        class InvalidCredentialsEx extends createExceptionWrapper(
+            AuthenticationException,
+            ExceptionMessageDictionary[EX_AUTH_INVALID_CREDENTIALS],
+            EX_AUTH_INVALID_CREDENTIALS
+        ) {}
+
+        class MissingTokenEx extends createExceptionWrapper(
+            AuthenticationException,
+            ExceptionMessageDictionary[EX_AUTH_MISSING_TOKEN],
+            EX_AUTH_MISSING_TOKEN
+        ) {}
+
+        class NotHasAbilityEx extends createExceptionWrapper(
+            AuthorizationException,
+            ExceptionMessageDictionary[EX_AUTH_NOT_HAS_ABILITY],
+            EX_AUTH_NOT_HAS_ABILITY
+        ) {}
+
+        class NotHasOwnershipEx extends createExceptionWrapper(
+            AuthorizationException,
+            ExceptionMessageDictionary[EX_AUTH_NOT_HAS_OWNERSHIP],
+            EX_AUTH_NOT_HAS_OWNERSHIP
+        ) {}
+
+        describe('class InvalidCredentialsEx', () => {
+            test('returns a class extending Exception', () => {
+                expect(InvalidCredentialsEx).toBeFunction();
+                expect(InvalidCredentialsEx.prototype).toBeInstanceOf(Exception);
+            });
+            describe('new InvalidCredentialsEx(Error)', () => {
+                const $err = new Error('I am an ugly error.');
+                const $ex = new InvalidCredentialsEx($err);
+                test('inherits from expected classes', () => {
+                    expect($ex).toBeInstanceOf(AuthenticationException);
+                    expect($ex).toBeInstanceOf(AuthException);
+                    expect($ex).toBeInstanceOf(Exception);
+                });
+                test('has expected properties', () => {
+                    expect($ex.message).toBe(ExceptionMessageDictionary[EX_AUTH_INVALID_CREDENTIALS]);
+                    expect($ex.code).toBe(EX_AUTH_INVALID_CREDENTIALS);
+                    expect($ex.err).toBe($err);
+                });
+            });
+        });
     });
 });
