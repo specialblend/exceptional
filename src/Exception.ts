@@ -1,21 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-export type TNewException<TCode, TPayload, TError> = new (...args: any[]) => IException<TCode, TPayload, TError>;
+export type TNewException<TCode, TData, TError> = new (...args: any[]) => IException<TCode, TData, TError>;
 
-export interface IException<TCode, TPayload, TError> {
+export interface IException<TCode, TData, TError> {
     message: string;
     code: TCode;
     err?: TError;
-    data?: TPayload;
+    data?: TData;
 }
 
-export class Exception<TCode, TPayload, TError> implements IException<TCode, TPayload, TError> {
+export class Exception<TCode, TData, TError> implements IException<TCode, TData, TError> {
     public message: string;
     public code: TCode;
-    public data?: TPayload;
+    public data?: TData;
     public err?: TError;
 
-    constructor(message: string, code: TCode, data?: TPayload, err?: TError) {
+    constructor(message: string, code: TCode, data?: TData, err?: TError) {
         this.message = message;
         this.code = code;
         this.data = data;
@@ -46,10 +46,10 @@ export class GenericException extends Exception<string, Record<string, any>, Err
  * @param {Function} Factory parent class to extend
  * @param {string} message message
  * @param {TCode} code exception code
- * @param {TPayload} data payload
+ * @param {TData} data payload
  * @returns {Function} wrapper class
  */
-export function createExceptionWrapper<TCode, TPayload, TError>(Factory: TNewException<TCode, TPayload, TError>, message: string, code: TCode, data?: TPayload) {
+export function createExceptionWrapper<TCode, TData, TError>(Factory: TNewException<TCode, TData, TError>, message: string, code: TCode, data?: TData) {
     return class extends Factory {
         constructor(err: TError) {
             super();
@@ -64,7 +64,7 @@ export function createExceptionWrapper<TCode, TPayload, TError>(Factory: TNewExc
  * @param {Function} handler async handler
  * @returns {Promise<void>} none
  */
-export async function tryCatchWrap<TCode, TPayload, TError>(Factory: TNewException<TCode, TPayload, TError>, handler: CallableFunction): Promise<void> {
+export async function tryCatchWrap<TCode, TData, TError>(Factory: TNewException<TCode, TData, TError>, handler: CallableFunction): Promise<void> {
     try {
         await handler();
     } catch (err) {

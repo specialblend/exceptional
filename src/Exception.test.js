@@ -1,4 +1,4 @@
-import { Exception, fromError, GenericException, tryCatchWrap } from './Exception';
+import { Exception, GenericException } from './Exception';
 
 describe('Exception', () => {
     test('is Function', () => {
