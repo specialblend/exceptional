@@ -101,7 +101,7 @@ describe('tryCatchWrap', () => {
                 }
             });
         });
-        describe('class NotHasAbilityEx', () => {
+        describe('class NotHasOwnershipEx', () => {
             test('throws expected Exception', async() => {
                 const $err = new Error('I am an ugly error.');
                 async function handler() {
