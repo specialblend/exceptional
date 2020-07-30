@@ -1,73 +1,73 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-export type TNewException<TCode, TData, TError> = new (...args: any[]) => IException<TCode, TData, TError>;
+export type TNewException<TData, TError> = new (...args: any[]) => IException<TData, TError>;
 
-export interface IException<TCode, TData, TError> {
+export interface IException<TData, TError> {
     message: string;
-    code: TCode;
+    code: string;
     err?: TError;
     data?: TData;
 }
 
-export class Exception<TCode, TData, TError> implements IException<TCode, TData, TError> {
+export class Exception<TData, TError> implements IException<TData, TError> {
     public message: string;
-    public code: TCode;
     public data?: TData;
     public err?: TError;
 
-    constructor(message: string, code: TCode, data?: TData, err?: TError) {
+    get code(): string {
+        return this.constructor.name;
+    }
+
+    constructor(message: string, data?: TData, err?: TError) {
         this.message = message;
-        this.code = code;
         this.data = data;
         this.err = err;
     }
 
-    public toError(): Error {
-        const message = this.formatErrorMessage();
-        const err = new Error(message);
-        const data = { ...this.data };
-        const code = this.code;
-        Object.assign(err, { data, code });
-        return err;
+    toString(): string {
+        // return `<${this.code} message='${this.message}' data='${JSON.stringify(this.data)}' />`;
+        const { code, message, data, err } = this;
+        return JSON.stringify({ code, message, data, err });
     }
 
-    protected formatErrorMessage(): string {
-        return [this.code, this.message].join(': ');
+    print(): void {
+        console.log(this.code, this.message, this.data, this.err);
     }
 }
 
-/**
- * GenericException: An Exception with string code, JavaScript Object payload, JavaScript Error
- */
-export class GenericException extends Exception<string, Record<string, any>, Error> {}
-
-/**
- * Returns a class extending `Factory` which can wrap JavaScript errors using `new` syntax
- * @param {Function} Factory parent class to extend
- * @param {string} message message
- * @param {TCode} code exception code
- * @param {TData} data payload
- * @returns {Function} wrapper class
- */
-export function createExceptionWrapper<TCode, TData, TError>(Factory: TNewException<TCode, TData, TError>, message: string, code: TCode, data?: TData) {
-    return class extends Factory {
-        constructor(err: TError) {
-            super();
-            return new Factory(message, code, data, err);
-        }
-    };
+export interface ICandyWrapper<TData, TError> {
+    exception: TNewException<TData, TError>;
+    message: string;
+    data?: TData;
 }
 
 /**
- * Calls provided async handler, wraps unhandled Error into Exception and rethrows.
- * @param {Function} Factory parent class to extend
+ * GenericException: An Exception with JavaScript Object payload, JavaScript Error
+ */
+export class GenericException extends Exception<Record<string, any>, Error> {}
+
+/**
+ * Wraps a JavaScript Error into an Exception
+ * @param {ICandyWrapper} wrapper wrapper
+ * @param {TError} err JavaScript Error
+ * @returns {IException} new Exception
+ */
+export function wrapCandy<TData, TError>(wrapper: ICandyWrapper<TData, TError>, err: TError): IException<TData, TError> {
+    const { exception: WrappedCandy, data, message } = wrapper;
+    return new WrappedCandy(message, data, err);
+}
+
+/**
+ * Calls and returns from provided async handler, or
+ * catches error, wraps into Exception, and rethrows.
  * @param {Function} handler async handler
+ * @param {Function} wrapper candy wrapper
  * @returns {Promise<void>} none
  */
-export async function tryCatchWrap<TCode, TData, TError>(Factory: TNewException<TCode, TData, TError>, handler: CallableFunction): Promise<void> {
+export async function tryCatchWrap<TData, TError, TReturn>(handler: CallableFunction, wrapper: ICandyWrapper<TData, TError>): Promise<TReturn> {
     try {
-        await handler();
+        return await handler();
     } catch (err) {
-        throw new Factory(err);
+        throw wrapCandy(wrapper, err);
     }
 }

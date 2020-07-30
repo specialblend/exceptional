@@ -32,7 +32,7 @@ interface FancyExceptionData {
         bar: 13,
     };
     try {
-        await tryCatchWrap(throwExampleErr, MySuperFancyException, 'I am a super friendly error message', data);
+        await tryCatchWrap(MySuperFancyException, throwExampleErr);
     } catch (ex) {
         console.error(ex.message, ex.code, ex.data, ex.err);
     }
