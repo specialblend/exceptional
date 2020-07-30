@@ -29,13 +29,13 @@ Examples:
 
 import { Exception, tryCatchWrap } from './src/Exception';
 
-interface FancyExceptionData {
+interface IFancyData {
     foo: string,
     bar: number,
 }
 
 (function myFancyExceptionExample() {
-    class MyFancyException extends Exception<FancyExceptionData, Error> {}
+    class MyFancyException extends Exception<IFancyData, Error> {}
     try {
         try {
             throw new Error('I am an ugly error message');
@@ -52,7 +52,7 @@ interface FancyExceptionData {
 }());
 
 (async function mySuperFancyExceptionExample() {
-    class MySuperFancyException extends Exception<FancyExceptionData, Error> {}
+    class MySuperFancyException extends Exception<IFancyData, Error> {}
     function throwExampleErr() {
         throw new Error('I am a super ugly error message');
     }

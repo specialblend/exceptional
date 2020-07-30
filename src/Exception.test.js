@@ -1,6 +1,6 @@
 import 'jest-extended';
 
-import { Exception, GenericException, wrapCandy } from './Exception';
+import { Exception, GenericException, tryCatchWrap, wrapCandy } from './Exception';
 
 describe('Exception', () => {
     test('is Function', () => {
@@ -229,7 +229,8 @@ describe('MyException class extends Exception', () => {
 });
 
 describe('class NotHasAbilityEx extends GenericException {}', () => {
-    class NotHasAbilityEx extends GenericException {}
+    class NotHasAbilityEx extends GenericException {
+    }
     describe('when called', () => {
         const $wrapper = {
             exception: NotHasAbilityEx,
@@ -239,7 +240,7 @@ describe('class NotHasAbilityEx extends GenericException {}', () => {
                 userRef: 'user@example.com',
             },
         };
-        const $err = new Error('oh my-f@$!');
+        const $err = new Error('holy f@$!- i ded');
         const $ex = wrapCandy($wrapper, $err);
         test('returns expected IException', () => {
             expect($ex).toBeInstanceOf(Exception);
@@ -257,6 +258,40 @@ describe('class NotHasAbilityEx extends GenericException {}', () => {
         test.skip('looks good when thrown?', () => {
             console.log($ex);
             throw $ex;
+        });
+        describe('tryCatchWrap', () => {
+            test('is Function', () => {
+                expect(tryCatchWrap).toBeFunction();
+            });
+            describe('syntax is aesthetically pleasing', () => {
+                test('with static handler and static wrapper', async() => {
+                    try {
+                        await tryCatchWrap(
+                            async function handler() {
+                                throw $err;
+                            },
+                            {
+                                exception: NotHasAbilityEx,
+                                message: 'client does not have the ability to perform this action.',
+                                data: {
+                                    action: 'ViewAnyTransaction',
+                                    userRef: 'user@example.com',
+                                },
+                            }
+                        );
+                    } catch (_$ex) {
+                        expect(_$ex).toBeInstanceOf(GenericException);
+                        expect(_$ex).toBeInstanceOf(NotHasAbilityEx);
+                        expect(_$ex.code).toBe('NotHasAbilityEx');
+                        expect(_$ex.message).toBe('client does not have the ability to perform this action.');
+                        expect(_$ex.data).toMatchObject({
+                            action: 'ViewAnyTransaction',
+                            userRef: 'user@example.com',
+                        });
+                        expect(_$ex.err).toBe($err);
+                    }
+                });
+            });
         });
     });
 });
