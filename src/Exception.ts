@@ -23,6 +23,16 @@ export class Exception<TData, TError> implements IException<TData, TError> {
         this.data = data;
         this.err = err;
     }
+
+    toString(): string {
+        // return `<${this.code} message='${this.message}' data='${JSON.stringify(this.data)}' />`;
+        const { code, message, data, err } = this;
+        return JSON.stringify({ code, message, data, err });
+    }
+
+    print(): void {
+        console.log(this.code, this.message, this.data, this.err);
+    }
 }
 
 export interface ICandyWrapper<TData, TError> {
@@ -34,16 +44,7 @@ export interface ICandyWrapper<TData, TError> {
 /**
  * GenericException: An Exception with JavaScript Object payload, JavaScript Error
  */
-export class GenericException extends Exception<Record<string, any>, Error> {
-    public toError(): Error {
-        const message = `${this.code} ${this.message} ${JSON.stringify(this.data)}`;
-        const err = new Error(message);
-        const data = { ...this.data };
-        const code = this.code;
-        Object.assign(err, { data, code });
-        return err;
-    }
-}
+export class GenericException extends Exception<Record<string, any>, Error> {}
 
 /**
  * Wraps a JavaScript Error into an Exception
@@ -59,11 +60,11 @@ export function wrapCandy<TData, TError>(wrapper: ICandyWrapper<TData, TError>, 
 /**
  * Calls and returns from provided async handler, or
  * catches error, wraps into Exception, and rethrows.
- * @param {Function} wrapper candy wrapper
  * @param {Function} handler async handler
+ * @param {Function} wrapper candy wrapper
  * @returns {Promise<void>} none
  */
-export async function tryCatchWrap<TData, TError, TReturn>(wrapper: ICandyWrapper<TData, TError>, handler: CallableFunction): Promise<TReturn> {
+export async function tryCatchWrap<TData, TError, TReturn>(handler: CallableFunction, wrapper: ICandyWrapper<TData, TError>): Promise<TReturn> {
     try {
         return await handler();
     } catch (err) {

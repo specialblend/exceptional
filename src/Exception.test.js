@@ -1,6 +1,6 @@
 import 'jest-extended';
 
-import { Exception, GenericException } from './Exception';
+import { Exception, GenericException, wrapCandy } from './Exception';
 
 describe('Exception', () => {
     test('is Function', () => {
@@ -15,10 +15,9 @@ describe('Exception', () => {
                 foo: 'example.foo',
                 bar: 'example.bar',
             };
-            const $code = 'alpha';
             beforeAll(() => {
                 try {
-                    $ex = new Exception($message, $code, $data);
+                    $ex = new Exception($message, $data);
                 } catch (err) {
                     $reject(err);
                 }
@@ -36,36 +35,10 @@ describe('Exception', () => {
                 expect($ex.message).toBe($message);
                 expect($ex.data).toMatchObject($data);
                 expect($ex.data).toBe($data);
-                expect($ex.code).toBe($code);
+                expect($ex.code).toBe('Exception');
                 expect($ex.err).toBeUndefined();
             });
 
-            describe('method', () => {
-                describe('formatErrorMessage', () => {
-                    test('is Function', () => {
-                        expect($ex.formatErrorMessage).toBeFunction();
-                    });
-                    describe('when called', () => {
-                        test('returns expected string', () => {
-                            expect($ex.formatErrorMessage()).toBe(`${$ex.code}: ${$message}`);
-                        });
-                    });
-                });
-                describe('toError', () => {
-                    test('is Function', () => {
-                        expect($ex.toError).toBeFunction();
-                    });
-                    describe('when called', () => {
-                        test('returns expected Error', () => {
-                            const $err = $ex.toError();
-                            expect($err).toBeInstanceOf(Error);
-                            expect($err.message).toBe($ex.formatErrorMessage());
-                            expect($err.code).toBe($ex.code);
-                            expect($err.data).toMatchObject($data);
-                        });
-                    });
-                });
-            });
         });
         describe('with err parameter', () => {
             let $ex = null;
@@ -75,11 +48,10 @@ describe('Exception', () => {
                 foo: 'example.foo',
                 bar: 'example.bar',
             };
-            const $code = 'bravo';
             const _$err = new Error('test error!');
             beforeAll(() => {
                 try {
-                    $ex = new Exception($message, $code, $data, _$err);
+                    $ex = new Exception($message, $data, _$err);
                 } catch (err) {
                     $reject(err);
                 }
@@ -97,36 +69,10 @@ describe('Exception', () => {
                 expect($ex.message).toBe($message);
                 expect($ex.data).toMatchObject($data);
                 expect($ex.data).toBe($data);
-                expect($ex.code).toBe($code);
+                expect($ex.code).toBe('Exception');
                 expect($ex.err).toBe(_$err);
             });
 
-            describe('method', () => {
-                describe('formatErrorMessage', () => {
-                    test('is Function', () => {
-                        expect($ex.formatErrorMessage).toBeFunction();
-                    });
-                    describe('when called', () => {
-                        test('returns expected string', () => {
-                            expect($ex.formatErrorMessage()).toBe(`${$ex.code}: ${$message}`);
-                        });
-                    });
-                });
-                describe('toError', () => {
-                    test('is Function', () => {
-                        expect($ex.toError).toBeFunction();
-                    });
-                    describe('when called', () => {
-                        test('returns expected Error', () => {
-                            const $err = $ex.toError();
-                            expect($err).toBeInstanceOf(Error);
-                            expect($err.message).toBe($ex.formatErrorMessage());
-                            expect($err.code).toBe($ex.code);
-                            expect($err.data).toMatchObject($data);
-                        });
-                    });
-                });
-            });
         });
     });
 });
@@ -144,10 +90,9 @@ describe('GenericException', () => {
                 foo: 'example.foo',
                 bar: 'example.bar',
             };
-            const $code = 'charlie';
             beforeAll(() => {
                 try {
-                    $ex = new GenericException($message, $code, $data);
+                    $ex = new GenericException($message, $data);
                 } catch (err) {
                     $reject(err);
                 }
@@ -165,35 +110,8 @@ describe('GenericException', () => {
                 expect($ex.message).toBe($message);
                 expect($ex.data).toMatchObject($data);
                 expect($ex.data).toBe($data);
-                expect($ex.code).toBe($code);
+                expect($ex.code).toBe('GenericException');
                 expect($ex.err).toBeUndefined();
-            });
-
-            describe('method', () => {
-                describe('formatErrorMessage', () => {
-                    test('is Function', () => {
-                        expect($ex.formatErrorMessage).toBeFunction();
-                    });
-                    describe('when called', () => {
-                        test('returns expected string', () => {
-                            expect($ex.formatErrorMessage()).toBe(`${$ex.code}: ${$message}`);
-                        });
-                    });
-                });
-                describe('toError', () => {
-                    test('is Function', () => {
-                        expect($ex.toError).toBeFunction();
-                    });
-                    describe('when called', () => {
-                        test('returns expected Error', () => {
-                            const $err = $ex.toError();
-                            expect($err).toBeInstanceOf(Error);
-                            expect($err.message).toBe($ex.formatErrorMessage());
-                            expect($err.code).toBe($ex.code);
-                            expect($err.data).toMatchObject($data);
-                        });
-                    });
-                });
             });
         });
         describe('with err parameter', () => {
@@ -204,11 +122,10 @@ describe('GenericException', () => {
                 foo: 'example.foo',
                 bar: 'example.bar',
             };
-            const $code = 'delta';
             const _$err = new Error('test error!');
             beforeAll(() => {
                 try {
-                    $ex = new GenericException($message, $code, $data, _$err);
+                    $ex = new GenericException($message, $data, _$err);
                 } catch (err) {
                     $reject(err);
                 }
@@ -226,42 +143,17 @@ describe('GenericException', () => {
                 expect($ex.message).toBe($message);
                 expect($ex.data).toMatchObject($data);
                 expect($ex.data).toBe($data);
-                expect($ex.code).toBe($code);
+                expect($ex.code).toBe('GenericException');
                 expect($ex.err).toBe(_$err);
-            });
-
-            describe('method', () => {
-                describe('formatErrorMessage', () => {
-                    test('is Function', () => {
-                        expect($ex.formatErrorMessage).toBeFunction();
-                    });
-                    describe('when called', () => {
-                        test('returns expected string', () => {
-                            expect($ex.formatErrorMessage()).toBe(`${$ex.code}: ${$message}`);
-                        });
-                    });
-                });
-                describe('toError', () => {
-                    test('is Function', () => {
-                        expect($ex.toError).toBeFunction();
-                    });
-                    describe('when called', () => {
-                        test('returns expected Error', () => {
-                            const $err = $ex.toError();
-                            expect($err).toBeInstanceOf(Error);
-                            expect($err.message).toBe($ex.formatErrorMessage());
-                            expect($err.code).toBe($ex.code);
-                            expect($err.data).toMatchObject($data);
-                        });
-                    });
-                });
             });
         });
     });
 });
 
 describe('MyException class extends Exception', () => {
-    class MyException extends Exception {}
+    class MyException extends Exception {
+    }
+
     test('is Function', () => {
         expect(MyException).toBeFunction();
     });
@@ -274,10 +166,9 @@ describe('MyException class extends Exception', () => {
                 foo: 'example.foo',
                 bar: 'example.bar',
             };
-            const $code = 'echo';
             beforeAll(() => {
                 try {
-                    $ex = new MyException($message, $code, $data);
+                    $ex = new MyException($message, $data);
                 } catch (err) {
                     $reject(err);
                 }
@@ -295,36 +186,10 @@ describe('MyException class extends Exception', () => {
                 expect($ex.message).toBe($message);
                 expect($ex.data).toMatchObject($data);
                 expect($ex.data).toBe($data);
-                expect($ex.code).toBe($code);
+                expect($ex.code).toBe('MyException');
                 expect($ex.err).toBeUndefined();
             });
 
-            describe('method', () => {
-                describe('formatErrorMessage', () => {
-                    test('is Function', () => {
-                        expect($ex.formatErrorMessage).toBeFunction();
-                    });
-                    describe('when called', () => {
-                        test('returns expected string', () => {
-                            expect($ex.formatErrorMessage()).toBe(`${$ex.code}: ${$message}`);
-                        });
-                    });
-                });
-                describe('toError', () => {
-                    test('is Function', () => {
-                        expect($ex.toError).toBeFunction();
-                    });
-                    describe('when called', () => {
-                        test('returns expected Error', () => {
-                            const $err = $ex.toError();
-                            expect($err).toBeInstanceOf(Error);
-                            expect($err.message).toBe($ex.formatErrorMessage());
-                            expect($err.code).toBe($ex.code);
-                            expect($err.data).toMatchObject($data);
-                        });
-                    });
-                });
-            });
         });
         describe('with err parameter', () => {
             let $ex = null;
@@ -334,11 +199,10 @@ describe('MyException class extends Exception', () => {
                 foo: 'example.foo',
                 bar: 'example.bar',
             };
-            const $code = 'foxtrot';
             const _$err = new Error('test error!');
             beforeAll(() => {
                 try {
-                    $ex = new MyException($message, $code, $data, _$err);
+                    $ex = new MyException($message, $data, _$err);
                 } catch (err) {
                     $reject(err);
                 }
@@ -356,36 +220,43 @@ describe('MyException class extends Exception', () => {
                 expect($ex.message).toBe($message);
                 expect($ex.data).toMatchObject($data);
                 expect($ex.data).toBe($data);
-                expect($ex.code).toBe($code);
+                expect($ex.code).toBe('MyException');
                 expect($ex.err).toBe(_$err);
             });
 
-            describe('method', () => {
-                describe('formatErrorMessage', () => {
-                    test('is Function', () => {
-                        expect($ex.formatErrorMessage).toBeFunction();
-                    });
-                    describe('when called', () => {
-                        test('returns expected string', () => {
-                            expect($ex.formatErrorMessage()).toBe(`${$ex.code}: ${$message}`);
-                        });
-                    });
-                });
-                describe('toError', () => {
-                    test('is Function', () => {
-                        expect($ex.toError).toBeFunction();
-                    });
-                    describe('when called', () => {
-                        test('returns expected Error', () => {
-                            const $err = $ex.toError();
-                            expect($err).toBeInstanceOf(Error);
-                            expect($err.message).toBe($ex.formatErrorMessage());
-                            expect($err.code).toBe($ex.code);
-                            expect($err.data).toMatchObject($data);
-                        });
-                    });
-                });
-            });
+        });
+    });
+});
+
+describe('class NotHasAbilityEx extends GenericException {}', () => {
+    class NotHasAbilityEx extends GenericException {}
+    describe('when called', () => {
+        const $wrapper = {
+            exception: NotHasAbilityEx,
+            message: 'client does not have the ability to perform this action.',
+            data: {
+                action: 'ViewAnyTransaction',
+                userRef: 'user@example.com',
+            },
+        };
+        const $err = new Error('oh my-f@$!');
+        const $ex = wrapCandy($wrapper, $err);
+        test('returns expected IException', () => {
+            expect($ex).toBeInstanceOf(Exception);
+            expect($ex).toBeInstanceOf(GenericException);
+            expect($ex).toBeInstanceOf(NotHasAbilityEx);
+            expect($ex.message).toBe($wrapper.message);
+            expect($ex.data).toBe($wrapper.data);
+        });
+        test('stringifies as expected', () => {
+            expect($ex.toString()).toBe('{"code":"NotHasAbilityEx","message":"client does not have the ability to perform this action.","data":{"action":"ViewAnyTransaction","userRef":"user@example.com"},"err":{}}');
+        });
+        test('looks good when printed?', () => {
+            $ex.print();
+        });
+        test.skip('looks good when thrown?', () => {
+            console.log($ex);
+            throw $ex;
         });
     });
 });
